@@ -1,5 +1,3 @@
-#!/bin/bash
-uname -r
-uname -a
+uname -ra
 cat /etc/passwd
 echo "killer"
