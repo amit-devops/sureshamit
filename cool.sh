@@ -1,0 +1,2 @@
+echo " cooolooooo"
+hostname
