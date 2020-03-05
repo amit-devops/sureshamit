@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartorder-service
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 5000
+      protocol: TCP
+  type: NodePort
+  selector:
+    app: smartorder
+    

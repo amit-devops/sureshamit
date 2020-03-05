@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::921289669923:role/dsd-devops
+      groups:
+        - system:masters 
+    - rolearn: arn:aws:iam::921289669923:role/dsd-dev-workers-NodeInstanceRole-1VPRCEKUCJRTK
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:nodes 
+        - system:bootstrappers       
+  mapUsers: |
+    - userarn: arn:aws:iam::155210401989:user/nsaraiya-infomagnus
+      username: nsaraiya-infomagnus
+      groups:
+        - system:masters
+    - userarn: arn:aws:iam::155210401989:user/ChristianNichols    
+      username: ChristianNichols    
+      groups:
+        - system:masters
+

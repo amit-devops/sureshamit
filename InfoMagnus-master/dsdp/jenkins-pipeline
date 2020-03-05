@@ -1,0 +1,32 @@
+node {
+   stage('Preparation') { // for display purposes
+      dir('Infomagnus') {
+          git branch: "${env.BRANCH}", url:'git@github.com:DSDPartnersInc/InfoMagnus.git'
+          sh "git tag -a -f -m Latest \"${env.ENVNAME}-${env.BUILD_NUMBER}\""
+          sh "git push --tags --force"
+      }
+   }
+   stage('Test') {
+      dir('Infomagnus') {
+        // Stop any running containers and prune docker
+        sh "docker-compose down"
+
+        // Run python tests (unit + integration) 
+        // inside dedicated docker container
+        sh "docker-compose -f docker-compose.test.yml build && docker-compose -f docker-compose.test.yml run --rm controller pytest && docker-compose -f docker-compose.test.yml run --rm denormalizer pytest && docker-compose -f docker-compose.test.yml run --rm prediction pytest"
+      }
+   }
+   stage('Build') {
+      dir('Infomagnus/aws/scripts') {
+        sh "./build-server.sh ${env.BUILD_NUMBER} ${env.ENVNAME} ${env.WORKSPACE}/Infomagnus/dsdp"
+        sh "./push-server.sh ${env.ENVNAME}-${env.BUILD_NUMBER} ${env.ENVNAME}"
+      }
+   }
+   stage('Deploy') {
+      dir('Infomagnus/aws/scripts') {
+        sh "./update-config.sh ${env.HOSTNAME} ${env.ENVNAME} ${env.WORKSPACE}/Infomagnus/dsdp"
+        sh "./update-server.sh ${env.BUILD_NUMBER} ${env.ENVNAME}"
+      }
+   }
+}
+
